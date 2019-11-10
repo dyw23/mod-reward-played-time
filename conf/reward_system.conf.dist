@@ -1,6 +1,13 @@
 [worldserver]
 
 #
+#    RewardSystemAnnounce
+#        Description: Announce the reward system
+#        Default:     1  - (Enabled)
+# 
+RewardSystem.Announce = 1
+
+#
 #    RewardSystemEnable
 #        Description: Enable the reward system
 #        Default:     1  - (Enabled)

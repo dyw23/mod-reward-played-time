@@ -1,13 +1,9 @@
 # Reward System
-
-This is a module for [AzerothCore](http://www.azerothcore.org) that adds items for players that have stayed logged in the x amount of time.
+-- Latest build status with azerothcore: [![Build Status](https://travis-ci.org/milestorme/mod-reward-played-time.svg?branch=master)](https://travis-ci.org/milestorme/mod-reward-played-time)
 
 Current features:
 
--**This module rewards players the the time they have spent logged into the character it does a check if the player is AFK, also items can be added via the database.
-
-Upcoming features:
-
+*This module rewards players the the time they have spent logged into the character it does a check if the player is AFK, also items can be added via the database.
 
 ## Requirements
 

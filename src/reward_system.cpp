@@ -26,7 +26,7 @@ public:
 		}
 	}
 
-    void OnBeforeUpdate(Player* player, uint32 p_time)
+    void OnBeforeUpdate(Player* player, uint32 p_time) override
     {
         if (sConfigMgr->GetBoolDefault("RewardSystemEnable", true))
         {
@@ -87,7 +87,6 @@ public:
             std::string cfg_def_file = cfg_file + ".dist";
             sConfigMgr->LoadMore(cfg_def_file.c_str());
             sConfigMgr->LoadMore(cfg_file.c_str());
-            RewardSystem_Enable = sConfigMgr->GetBoolDefault("RewardSystemEnable", true);
             Max_roll = sConfigMgr->GetIntDefault("MaxRoll", 1000);
         }
     }

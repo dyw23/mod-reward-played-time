@@ -3,6 +3,7 @@
 #include "Configuration/Config.h"
 #include "Player.h"
 #include "AccountMgr.h"
+#include "Chat.h"
 #include "ScriptMgr.h"
 #include "Define.h"
 #include "GossipDef.h"

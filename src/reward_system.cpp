@@ -7,9 +7,21 @@
 #include "Define.h"
 #include "GossipDef.h"
 #include "Chat.h"
+#include "DataMap.h"
 
 bool RewardSystem_Enable;
 uint32 Max_roll;
+
+class RewardTimer : public DataMap::Base
+{
+public:
+    RewardTimer() { Reset(); }
+    void Reset()
+    {
+        timer = static_cast<uint32>(sConfigMgr->GetIntDefault("RewardTime", 1))*HOUR*IN_MILLISECONDS;
+    }
+    uint32 timer;
+};
 
 class reward_system : public PlayerScript
 {
@@ -35,9 +47,12 @@ public:
                 if (player->isAFK())
                     return;
 
-                if (RewardTimer <= p_time)
-                {
-                    roll = urand(1, Max_roll);
+        RewardTimer* rewardtimer = player->CustomData.GetDefault<RewardTimer>("RewardTimer");
+        if (rewardtimer->timer <= p_time)
+        {
+            rewardtimer->Reset();
+			
+                    uint32 roll = urand(1, Max_roll); //Lets make a random number from 1 to Max_roll
                     QueryResult result = CharacterDatabase.PQuery("SELECT item, quantity FROM reward_system WHERE roll = '%u'", roll);
 
                     if (!result)
@@ -59,8 +74,6 @@ public:
                         ChatHandler(player->GetSession()).PSendSysMessage("Congratulations you have won with a roll of %u", roll);
                     } while (result->NextRow());
 
-
-                    RewardTimer = (sConfigMgr->GetIntDefault("RewardTime", 1)*HOUR*IN_MILLISECONDS);
                 }
                 else  RewardTimer -= p_time;
             }

@@ -1,4 +1,7 @@
+# ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 # Reward System
+-- Latest build status with azerothcore: [![Build Status](https://travis-ci.org/azerothcore/mod-reward-played-time.svg?branch=master)](https://travis-ci.org/azerothcore/mod-reward-played-time)
+
 
 This is a module for [AzerothCore](http://www.azerothcore.org) that adds items for players that have stayed logged in the x amount of time.
 

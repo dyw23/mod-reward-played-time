@@ -86,7 +86,7 @@ public:
 
         if (!item_proto)
         {
-            sLog->outError("[Reward System] The itemId is invalid: %u", itemId, count);
+            sLog->outError("[Reward System] The itemId is invalid: %u", itemId);
             return;
         }
 
@@ -115,7 +115,7 @@ public:
         }
 
         // from console show not existed sender
-        MailSender sender(MAIL_NORMAL, receiver->GetSession() ? receiver->GetGUIDLow() : 0, MAIL_STATIONERY_GM);
+        MailSender sender(MAIL_NORMAL, receiver->GetSession() ? receiver->GetGUIDLow() : 0, MAIL_STATIONERY_TEST);
 
         // fill mail
         MailDraft draft(subject, text);

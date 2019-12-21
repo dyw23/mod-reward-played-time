@@ -110,7 +110,7 @@ public:
 
         if (items.size() > MAX_MAIL_ITEMS)
         {
-            sLog->outError("[Reward System] Maximum email items is %u, current size: %u", MAX_MAIL_ITEMS, items.size());
+            sLog->outError("[Reward System] Maximum email items is %u, current size: %lu", MAX_MAIL_ITEMS, items.size());
             return;
         }
 

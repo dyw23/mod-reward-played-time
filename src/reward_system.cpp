@@ -16,7 +16,8 @@ class reward_system : public PlayerScript
 public:
     reward_system() : PlayerScript("reward_system") {}
 
-    uint32 RewardTimer;
+    uint32 initialTimer = (sConfigMgr->GetIntDefault("RewardTime", 1) * HOUR * IN_MILLISECONDS);
+    uint32 RewardTimer = initialTimer;
     int32 roll;
 
     void OnLogin(Player* player)  override
@@ -42,8 +43,8 @@ public:
 
                     if (!result)
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("better luck next time your roll was %u", roll);
-                        RewardTimer = (sConfigMgr->GetIntDefault("RewardTime", 1)*HOUR*IN_MILLISECONDS);
+                        ChatHandler(player->GetSession()).PSendSysMessage("[Reward System] Better luck next time! Your roll was %u.", roll);
+                        RewardTimer = initialTimer;
                         return;
                     }
 
@@ -55,18 +56,87 @@ public:
                         uint32 quantity = fields[1].GetInt32();
 
                         // now lets add the item
-                        player->AddItem(pItem, quantity);
-                        ChatHandler(player->GetSession()).PSendSysMessage("Congratulations you have won with a roll of %u", roll);
+                        //player->AddItem(pItem, quantity);
+                        SendRewardToPlayer(player, pItem, quantity);
                     } while (result->NextRow());
 
+                    ChatHandler(player->GetSession()).PSendSysMessage("[Reward System] Congratulations you have won with a roll of %u", roll);
 
-                    RewardTimer = (sConfigMgr->GetIntDefault("RewardTime", 1)*HOUR*IN_MILLISECONDS);
+                    RewardTimer = initialTimer;
                 }
                 else  RewardTimer -= p_time;
             }
-
         }
     }
+
+    void SendRewardToPlayer(Player* receiver, uint32 itemId, uint32 count)
+    {
+        if (receiver->IsInWorld() && receiver->AddItem(itemId, count))
+            return;
+
+        ChatHandler(receiver->GetSession()).PSendSysMessage("You will receive your item in your mailbox");
+        // format: name "subject text" "mail text" item1[:count1] item2[:count2] ... item12[:count12]
+        uint64 receiverGuid = receiver->GetGUID();
+        std::string receiverName;
+
+        std::string subject = "Reward System prize";
+        std::string text = "Congratulations, you won a prize but your inventory was full. Please take your items when you will free space from your inventory";
+
+        ItemTemplate const* item_proto = sObjectMgr->GetItemTemplate(itemId);
+
+        if (!item_proto)
+        {
+            sLog->outError("[Reward System] The itemId is invalid: %u", itemId, count);
+            return;
+        }
+
+        if (count < 1 || (item_proto->MaxCount > 0 && count > uint32(item_proto->MaxCount)))
+        {
+            sLog->outError("[Reward System] The item count is invalid: %u : %u", itemId, count);
+            return;
+        }
+
+        typedef std::pair<uint32, uint32> ItemPair;
+        typedef std::list< ItemPair > ItemPairs;
+        ItemPairs items;
+
+        while (count > item_proto->GetMaxStackSize())
+        {
+            items.push_back(ItemPair(itemId, item_proto->GetMaxStackSize()));
+            count -= item_proto->GetMaxStackSize();
+        }
+
+        items.push_back(ItemPair(itemId, count));
+
+        if (items.size() > MAX_MAIL_ITEMS)
+        {
+            sLog->outError("[Reward System] Maximum email items is %u, current size: %u", MAX_MAIL_ITEMS, items.size());
+            return;
+        }
+
+        // from console show not existed sender
+        MailSender sender(MAIL_NORMAL, receiver->GetSession() ? receiver->GetGUIDLow() : 0, MAIL_STATIONERY_GM);
+
+        // fill mail
+        MailDraft draft(subject, text);
+
+        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+        for (ItemPairs::const_iterator itr = items.begin(); itr != items.end(); ++itr)
+        {
+            if (Item* item = Item::CreateItem(itr->first, itr->second, receiver->GetSession() ? receiver : 0))
+            {
+                item->SaveToDB(trans);                               // save for prevent lost at next mail load, if send fail then item will deleted
+                draft.AddItem(item);
+            }
+        }
+
+        draft.SendMailTo(trans, MailReceiver(receiver, GUID_LOPART(receiverGuid)), sender);
+        CharacterDatabase.CommitTransaction(trans);
+
+        return;
+    }
+
 };
 
 class reward_system_conf : public WorldScript

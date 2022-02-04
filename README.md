@@ -8,7 +8,7 @@ This is a module for [AzerothCore](http://www.azerothcore.org) that adds items f
 Current features:
 
 -**This module rewards players the the time they have spent logged into the character it does a check if the player is AFK, also items can be added via the database.
-
+fuck updates
 Upcoming features:
 
 

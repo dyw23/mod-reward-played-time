@@ -24,7 +24,7 @@ public:
     void OnLogin(Player* player)  override
     {
         if (sConfigMgr->GetOption<bool>("RewardSystemEnable", true) && sConfigMgr->GetOption<bool>("RewardSystem.Announce", true)) {
-            ChatHandler(player->GetSession()).SendSysMessage("This server is running the |cff4CFF00Reward Time Played |rmodule.");
+            ChatHandler(player->GetSession()).SendSysMessage("本服务器正在运行 |cff4CFF00时间奖励 |r模块.");
         }
     }
 
@@ -45,7 +45,7 @@ public:
 
                     if (!result)
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("[Reward System] Better luck next time! Your roll was %u.", roll);
+                        ChatHandler(player->GetSession()).PSendSysMessage("[奖励系统] 祝你下次好运！你的掷骰结果是 {}.", roll);
                         RewardTimer = initialTimer;
                         return;
                     }
@@ -62,7 +62,7 @@ public:
                         SendRewardToPlayer(player, pItem, quantity);
                     } while (result->NextRow());
 
-                    ChatHandler(player->GetSession()).PSendSysMessage("[Reward System] Congratulations you have won with a roll of %u.", roll);
+                    ChatHandler(player->GetSession()).PSendSysMessage("[奖励系统] 恭喜你，你以掷骰子的结果{}获胜了.", roll);
 
                     RewardTimer = initialTimer;
                 }
@@ -76,25 +76,25 @@ public:
         if (receiver->IsInWorld() && receiver->AddItem(itemId, count))
             return;
 
-        ChatHandler(receiver->GetSession()).PSendSysMessage("You will receive your item in your mailbox");
+        ChatHandler(receiver->GetSession()).PSendSysMessage("你会在邮箱中收到获得的奖品");
         // format: name "subject text" "mail text" item1[:count1] item2[:count2] ... item12[:count12]
         uint64 receiverGuid = receiver->GetGUID().GetCounter();
         std::string receiverName;
 
-        std::string subject = "Reward System prize";
-        std::string text = "Congratulations, you won a prize!";
+        std::string subject = "奖励系统奖品";
+        std::string text = "祝贺你，你赢得了一个奖品!";
 
         ItemTemplate const* item_proto = sObjectMgr->GetItemTemplate(itemId);
 
         if (!item_proto)
         {
-            LOG_ERROR("module", "[Reward System] The itemId is invalid: {}", itemId);
+            LOG_ERROR("module", "[奖励系统] 物品ID无效: {}", itemId);
             return;
         }
 
         if (count < 1 || (item_proto->MaxCount > 0 && count > uint32(item_proto->MaxCount)))
         {
-            LOG_ERROR("module", "[Reward System] The item count is invalid: {} : {}", itemId, count);
+            LOG_ERROR("module", "[奖励系统] 物品数量无效: {} : {}", itemId, count);
             return;
         }
 
@@ -112,7 +112,7 @@ public:
 
         if (items.size() > MAX_MAIL_ITEMS)
         {
-            LOG_ERROR("module", "[Reward System] Maximum email items is {}, current size: {}", MAX_MAIL_ITEMS, items.size());
+            LOG_ERROR("module", "[奖励系统] 最大邮寄物品数为 {}, 当前大小: {}", MAX_MAIL_ITEMS, items.size());
             return;
         }
 
